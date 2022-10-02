@@ -3,6 +3,119 @@ HW2
 Shirley Liang
 2022-09-26
 
+Setup for HW2
+
+### Problem 1
+
+``` r
+transit <- read_csv("NYC_Transit_Subway_Entrance_And_Exit_Data.csv", col_types = cols(Route8 = "c", Route9 = "c", Route10 = "c", Route11 = "c")) %>% 
+  janitor::clean_names() %>% 
+  select(line, station_name, station_latitude, station_longitude, starts_with("route"), entry, exit_only, vending, entrance_type, ada) %>% 
+  mutate(entry = ifelse(entry == "YES", TRUE, FALSE))
+
+transit %>% 
+  select(station_name, line) %>% 
+  distinct()
+```
+
+    ## # A tibble: 465 × 2
+    ##    station_name             line    
+    ##    <chr>                    <chr>   
+    ##  1 25th St                  4 Avenue
+    ##  2 36th St                  4 Avenue
+    ##  3 45th St                  4 Avenue
+    ##  4 53rd St                  4 Avenue
+    ##  5 59th St                  4 Avenue
+    ##  6 77th St                  4 Avenue
+    ##  7 86th St                  4 Avenue
+    ##  8 95th St                  4 Avenue
+    ##  9 9th St                   4 Avenue
+    ## 10 Atlantic Av-Barclays Ctr 4 Avenue
+    ## # … with 455 more rows
+
+``` r
+transit %>% 
+  filter(ada == TRUE) %>% 
+  select(station_name, line) %>% 
+  distinct()
+```
+
+    ## # A tibble: 84 × 2
+    ##    station_name                   line           
+    ##    <chr>                          <chr>          
+    ##  1 Atlantic Av-Barclays Ctr       4 Avenue       
+    ##  2 DeKalb Av                      4 Avenue       
+    ##  3 Pacific St                     4 Avenue       
+    ##  4 Grand Central                  42nd St Shuttle
+    ##  5 34th St                        6 Avenue       
+    ##  6 47-50th Sts Rockefeller Center 6 Avenue       
+    ##  7 Church Av                      6 Avenue       
+    ##  8 21st St                        63rd Street    
+    ##  9 Lexington Av                   63rd Street    
+    ## 10 Roosevelt Island               63rd Street    
+    ## # … with 74 more rows
+
+``` r
+transit %>% 
+  filter(vending == "NO") %>% 
+  pull(entry) %>% 
+  mean
+```
+
+    ## [1] 0.3770492
+
+``` r
+transit %>% 
+  pivot_longer(route1:route11, names_to = "route_num", values_to = "route") %>% 
+  filter(route == "A") %>% 
+  select(station_name, line) %>% 
+  distinct()
+```
+
+    ## # A tibble: 60 × 2
+    ##    station_name                  line           
+    ##    <chr>                         <chr>          
+    ##  1 Times Square                  42nd St Shuttle
+    ##  2 125th St                      8 Avenue       
+    ##  3 145th St                      8 Avenue       
+    ##  4 14th St                       8 Avenue       
+    ##  5 168th St - Washington Heights 8 Avenue       
+    ##  6 175th St                      8 Avenue       
+    ##  7 181st St                      8 Avenue       
+    ##  8 190th St                      8 Avenue       
+    ##  9 34th St                       8 Avenue       
+    ## 10 42nd St                       8 Avenue       
+    ## # … with 50 more rows
+
+``` r
+transit %>% 
+  pivot_longer(route1:route11, names_to = "route_num", values_to = "route") %>% 
+  filter(route == "A", ada == TRUE) %>% 
+  select(station_name, line) %>% 
+  distinct()
+```
+
+    ## # A tibble: 17 × 2
+    ##    station_name                  line            
+    ##    <chr>                         <chr>           
+    ##  1 14th St                       8 Avenue        
+    ##  2 168th St - Washington Heights 8 Avenue        
+    ##  3 175th St                      8 Avenue        
+    ##  4 34th St                       8 Avenue        
+    ##  5 42nd St                       8 Avenue        
+    ##  6 59th St                       8 Avenue        
+    ##  7 Inwood - 207th St             8 Avenue        
+    ##  8 West 4th St                   8 Avenue        
+    ##  9 World Trade Center            8 Avenue        
+    ## 10 Times Square-42nd St          Broadway        
+    ## 11 59th St-Columbus Circle       Broadway-7th Ave
+    ## 12 Times Square                  Broadway-7th Ave
+    ## 13 8th Av                        Canarsie        
+    ## 14 Franklin Av                   Franklin        
+    ## 15 Euclid Av                     Fulton          
+    ## 16 Franklin Av                   Fulton          
+    ## 17 Howard Beach                  Rockaway
+
 ------------------------------------------------------------------------
 
 ### Problem 2
@@ -128,6 +241,25 @@ unemp <- unemp %>% mutate(Month = case_when(
 #### Merge polsmonth, snp , and unemp datasets.
 
 ``` r
-mergeset <- inner_join(polsmonth, snp, by = c("Year", "Month")) %>%
-            inner_join(unemp, by = c("Year", "Month"))
+mergeset <- left_join(polsmonth, snp, by = c("Year", "Month")) %>%
+            left_join(unemp, by = c("Year", "Month"))
 ```
+
+The pols-month dataset includes data related to the number of national
+politicians who are democratic or republican at a given time. After
+cleaning, it includes 822 observations and the following variables:
+Year, Month, gov_gop, sen_gop, rep_gop, gov_dem, sen_dem, rep_dem,
+president.
+
+The snp dataset includes Standard & Poor’s stock market index that
+represent stock market as whole. After cleaning, it includes 787
+observations and the following variables: Month, Year, close.
+
+The unemployment dataset includes percentage of unemployment in each
+month of the associated year. After cleaning, it includes 816
+observations and the following variables: Year, Month, Percentage.
+
+The merged dataste contains 822 observations and the following
+variables: Year, Month, gov_gop, sen_gop, rep_gop, gov_dem, sen_dem,
+rep_dem, president, close, Percentage (11 variables). The dataset
+includes data range from year between 1947 and 2015.

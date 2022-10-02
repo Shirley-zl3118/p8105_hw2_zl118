@@ -4,7 +4,7 @@ author: "Shirley Liang"
 date: "2022-09-26"
 output: github_document
 ---
-
+Setup for HW2
 ```{r setup, include=FALSE}
 
 library(tidyverse)
@@ -12,10 +12,40 @@ library(readxl)
 
 ```
 
+### Problem 1
 
 ```{r Problem1}
 
+transit <- read_csv("NYC_Transit_Subway_Entrance_And_Exit_Data.csv", col_types = cols(Route8 = "c", Route9 = "c", Route10 = "c", Route11 = "c")) %>% 
+  janitor::clean_names() %>% 
+  select(line, station_name, station_latitude, station_longitude, starts_with("route"), entry, exit_only, vending, entrance_type, ada) %>% 
+  mutate(entry = ifelse(entry == "YES", TRUE, FALSE))
 
+transit %>% 
+  select(station_name, line) %>% 
+  distinct()
+
+transit %>% 
+  filter(ada == TRUE) %>% 
+  select(station_name, line) %>% 
+  distinct()
+
+transit %>% 
+  filter(vending == "NO") %>% 
+  pull(entry) %>% 
+  mean
+
+transit %>% 
+  pivot_longer(route1:route11, names_to = "route_num", values_to = "route") %>% 
+  filter(route == "A") %>% 
+  select(station_name, line) %>% 
+  distinct()
+
+transit %>% 
+  pivot_longer(route1:route11, names_to = "route_num", values_to = "route") %>% 
+  filter(route == "A", ada == TRUE) %>% 
+  select(station_name, line) %>% 
+  distinct()
 
 ```
 ***
@@ -148,12 +178,18 @@ unemp <- unemp %>% mutate(Month = case_when(
 
 ``` {r Problem3 Merge dataset}
 
-mergeset <- inner_join(polsmonth, snp, by = c("Year", "Month")) %>%
-            inner_join(unemp, by = c("Year", "Month"))
+mergeset <- left_join(polsmonth, snp, by = c("Year", "Month")) %>%
+            left_join(unemp, by = c("Year", "Month"))
 
 ```
 
+The pols-month dataset includes data related to the number of national politicians who are democratic or republican at a given time. After cleaning, it includes `r count(polsmonth)` observations and the following variables: `r names(polsmonth)`. 
 
+The snp dataset includes Standard & Poor’s stock market index that represent stock market as  whole. After cleaning, it includes `r count(snp)` observations and the following variables: `r names(snp)`. 
+
+The unemployment dataset includes percentage of unemployment in each month of the associated year. After cleaning, it includes `r count(unemp)` observations and the following variables: `r names(unemp)`.
+
+The merged dataste contains `r count(mergeset)` observations and the following variables: `r names(mergeset)` (`r ncol(mergeset)` variables). The dataset includes data range from year between `r min(mergeset$Year)` and `r max(mergeset$Year)`. 
 
 
 
