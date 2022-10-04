@@ -56,21 +56,18 @@ transit %>%
 
 ```{r Problem2 import}
 
-importMtrashwheel <- read_excel("Trash-Wheel-Collection-Totals-7-2020-2.xlsx", sheet = "Mr. Trash Wheel", range = "A2:N535") %>% 
+importMtrashwheel <- read_excel("Trash Wheel Collection Data.xlsx", sheet = "Mr. Trash Wheel", range = "A2:N535") %>% 
   janitor::clean_names()
 
-mtrashwheel <- mutate(importMtrashwheel, dumpster = as.numeric(dumpster))
+mtrashwheel <- mutate(importMtrashwheel, dumpster = as.numeric(dumpster)) %>%
+  mutate(year = as.numeric(year))
 
 mtrashwheel <- drop_na(mtrashwheel, dumpster) %>%
   mutate(sports_balls = round(sports_balls)) %>%
   mutate(sports_balls = as.integer(sports_balls)) 
 
-importPtrashwheel <- read_excel("Trash-Wheel-Collection-Totals-7-2020-2.xlsx", sheet = "Professor Trash Wheel", range = "A2:N117") %>% 
+ptrashwheel <- read_excel("Trash Wheel Collection Data.xlsx", sheet = "Professor Trash Wheel", range = "A2:N117") %>% 
   janitor::clean_names()
-
-ptrashwheel <- importPtrashwheel %>% 
-  filter(!is.na(dumpster)) %>%
-  mutate(sports_balls = round(sports_balls), as.integer(sports_balls)) 
 
 ```
 ***
@@ -82,7 +79,7 @@ mtrashwheel <- mutate(mtrashwheel, ID = row_number(dumpster))
 
 ptrashwheel <- mutate(ptrashwheel, ID = row_number(dumpster)+453)
 
-trashwheel = bind_rows(mtrashwheel, ptrashwheel)
+trashwheel <- bind_rows(mtrashwheel, ptrashwheel)
 
 ```
 

@@ -123,26 +123,22 @@ transit %>%
 ##### For both “Mr. Trash Wheel” and “Professor Trash Wheel” sheet: Read file and omit non-data entries, omit rows that do not include dumpster-specific data, round the number of sports balls to the nearest integer and converts the result to an integer variable
 
 ``` r
-importMtrashwheel <- read_excel("Trash-Wheel-Collection-Totals-7-2020-2.xlsx", sheet = "Mr. Trash Wheel", range = "A2:N535") %>% 
+importMtrashwheel <- read_excel("Trash Wheel Collection Data.xlsx", sheet = "Mr. Trash Wheel", range = "A2:N535") %>% 
   janitor::clean_names()
 
-mtrashwheel <- mutate(importMtrashwheel, dumpster = as.numeric(dumpster))
-```
+mtrashwheel <- mutate(importMtrashwheel, dumpster = as.numeric(dumpster)) %>%
+  mutate(year = as.numeric(year))
 
-    ## Warning in mask$eval_all_mutate(quo): NAs introduced by coercion
-
-``` r
 mtrashwheel <- drop_na(mtrashwheel, dumpster) %>%
   mutate(sports_balls = round(sports_balls)) %>%
   mutate(sports_balls = as.integer(sports_balls)) 
 
-importPtrashwheel <- read_excel("Trash-Wheel-Collection-Totals-7-2020-2.xlsx", sheet = "Professor Trash Wheel", range = "A2:N117") %>% 
+ptrashwheel <- read_excel("Trash Wheel Collection Data.xlsx", sheet = "Professor Trash Wheel", range = "A2:N117") %>% 
   janitor::clean_names()
-
-ptrashwheel <- importPtrashwheel %>% 
-  filter(!is.na(dumpster)) %>%
-  mutate(sports_balls = round(sports_balls), as.integer(sports_balls)) 
 ```
+
+    ## New names:
+    ## • `` -> `...14`
 
 ------------------------------------------------------------------------
 
@@ -153,10 +149,10 @@ mtrashwheel <- mutate(mtrashwheel, ID = row_number(dumpster))
 
 ptrashwheel <- mutate(ptrashwheel, ID = row_number(dumpster)+453)
 
-trashwheel = bind_rows(mtrashwheel, ptrashwheel)
+trashwheel <- bind_rows(mtrashwheel, ptrashwheel)
 ```
 
-##### There are 453 dumpster observations in the “Mr. Trash Wheel” sheet and 71 dumpster observations in the “Professor Trash Wheel” sheet. After merging the two sheets, there are 524 dumpster observations in the recording sheet “Trash Wheel”. Each obseration include information about dumpster, month, year, date, weight_tons, volume_cubic_yards, plastic_bottles, polystyrene, cigarette_butts, glass_bottles, grocery_bags, chip_bags, sports_balls, homes_powered, ID, as.integer(sports_balls). The total weight of trash collected is 1585.2. The total number of sports balls in 2020 is 856.
+##### There are 533 dumpster observations in the “Mr. Trash Wheel” sheet and 115 dumpster observations in the “Professor Trash Wheel” sheet. After merging the two sheets, there are 648 dumpster observations in the recording sheet “Trash Wheel”. Each obseration include information about dumpster, month, year, date, weight_tons, volume_cubic_yards, plastic_bottles, polystyrene, cigarette_butts, glass_bottles, grocery_bags, chip_bags, sports_balls, homes_powered, ID, x14. The total weight of trash collected is 2087.49. The total number of sports balls in 2020 is NA.
 
 ### Problem 3
 
