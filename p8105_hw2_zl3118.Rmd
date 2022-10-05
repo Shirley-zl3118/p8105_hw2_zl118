@@ -1,5 +1,5 @@
 ---
-title: "HW2"
+title: "p8105_hw2_zl3118"
 author: "Shirley Liang"
 date: "2022-09-26"
 output: github_document
@@ -56,18 +56,21 @@ transit %>%
 
 ```{r Problem2 import}
 
-importMtrashwheel <- read_excel("Trash Wheel Collection Data.xlsx", sheet = "Mr. Trash Wheel", range = "A2:N535") %>% 
-  janitor::clean_names()
+importMtrashwheel <- read_excel("Trash Wheel Collection Data.xlsx", sheet = "Mr. Trash Wheel", range = "A2:N549") %>% 
+  janitor::clean_names() 
+
+importMtrashwheel <- importMtrashwheel[!is.na(importMtrashwheel$dumpster), ] 
 
 mtrashwheel <- mutate(importMtrashwheel, dumpster = as.numeric(dumpster)) %>%
   mutate(year = as.numeric(year))
 
 mtrashwheel <- drop_na(mtrashwheel, dumpster) %>%
-  mutate(sports_balls = round(sports_balls)) %>%
   mutate(sports_balls = as.integer(sports_balls)) 
 
-ptrashwheel <- read_excel("Trash Wheel Collection Data.xlsx", sheet = "Professor Trash Wheel", range = "A2:N117") %>% 
-  janitor::clean_names()
+ptrashwheel <- read_excel("Trash Wheel Collection Data.xlsx", sheet = "Professor Trash Wheel", range = "A2:M96") %>% 
+  janitor::clean_names() 
+
+ptrashwheel <- ptrashwheel[!is.na(ptrashwheel$dumpster), ] 
 
 ```
 ***
@@ -75,15 +78,20 @@ ptrashwheel <- read_excel("Trash Wheel Collection Data.xlsx", sheet = "Professor
 ##### Merge "Mr. Trash Wheel" and "Professor Trash Wheel" into "Trash Wheel" dataset.
 ```{r Problem2 merge}
 
+#mtrashwheel$dataset = "M"
+#ptrashwheel$dataset = "P"
+
+#trashwheel = full_join(mtrashwheel, ptrashwheel)
+
+
+
 mtrashwheel <- mutate(mtrashwheel, ID = row_number(dumpster))
-
 ptrashwheel <- mutate(ptrashwheel, ID = row_number(dumpster)+453)
-
 trashwheel <- bind_rows(mtrashwheel, ptrashwheel)
 
 ```
 
-##### There are `r nrow(mtrashwheel)` dumpster observations in the "Mr. Trash Wheel" sheet and `r nrow(ptrashwheel)` dumpster observations in the "Professor Trash Wheel" sheet. After merging the two sheets, there are `r nrow(trashwheel)` dumpster observations in the recording sheet "Trash Wheel". Each obseration include information about `r names(trashwheel)`. The total weight of trash collected is `r trashwheel %>% pull(weight_tons) %>% na.omit() %>% sum()`. The total number of sports balls in 2020 is `r trashwheel %>% filter(year == 2020) %>% pull(sports_balls) %>% sum()`.
+##### There are `r nrow(mtrashwheel)` dumpster observations in the "Mr. Trash Wheel" sheet and `r nrow(ptrashwheel)` dumpster observations in the "Professor Trash Wheel" sheet. After merging the two sheets, there are `r nrow(trashwheel)`  observations and `r ncol(trashwheel)` variables in the recording sheet "Trash Wheel". Each obseration include information about `r names(trashwheel)`. The total weight of trash collected is `r trashwheel %>% pull(weight_tons) %>% sum` tons. The total number of sports balls in 2020 is `r trashwheel %>% filter(year == 2020) %>% pull(sports_balls) %>% na.omit() %>% sum`.
 
 ### Problem 3
 
@@ -180,7 +188,7 @@ mergeset <- left_join(polsmonth, snp, by = c("Year", "Month")) %>%
 
 ```
 
-The pols-month dataset includes data related to the number of national politicians who are democratic or republican at a given time. After cleaning, it includes `r count(polsmonth)` observations and the following variables: `r names(polsmonth)`. 
+The pols-month dataset includes data related to the number of national politicians who are democratic or republican at a given time. After cleaning, it includes `r count(polsmonth)` observations and `r ncol(polsmonth)` variables，the following: `r names(polsmonth)`. 
 
 The snp dataset includes Standard & Poor’s stock market index that represent stock market as  whole. After cleaning, it includes `r count(snp)` observations and the following variables: `r names(snp)`. 
 
